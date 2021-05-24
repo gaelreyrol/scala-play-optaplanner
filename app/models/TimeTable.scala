@@ -26,6 +26,8 @@ case class TimeTable(private val _timeslots: List[Timeslot], private val _rooms:
 
     @PlanningScore
     var score: HardSoftScore = _;
+
+    def this() = this(List(), List(), List())
 }
 
 object TimeTable {

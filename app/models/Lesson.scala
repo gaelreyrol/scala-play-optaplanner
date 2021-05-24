@@ -6,7 +6,10 @@ import org.optaplanner.core.api.domain.variable.PlanningVariable;
 import play.api.libs.json._
 
 @PlanningEntity
-case class Lesson (@PlanningId val id: Int, val subject: String, val teacher: String, val studentGroup: String) {
+case class Lesson (val id: Int, val subject: String, val teacher: String, val studentGroup: String) {
+    @PlanningId
+    val internalId: Int = id
+
     @PlanningVariable(valueRangeProviderRefs = Array("timeslotRange"))
     var _timeslot: Timeslot = _
 
@@ -19,7 +22,9 @@ case class Lesson (@PlanningId val id: Int, val subject: String, val teacher: St
     def room = _room
     def room_= (room: Room) = this._room = room
 
-    override def toString(): String = "%s (%d)".format(this.subject, this.id)
+    def this() = this(0, "", "", "")
+
+    override def toString(): String = "%s (%d) - %s : %s".format(this.subject, this.id, this.teacher, this.studentGroup)
 }
 
 object Lesson {

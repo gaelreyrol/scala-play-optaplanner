@@ -4,6 +4,8 @@ import play.api.libs.json._
 
 case class Room(val name: String) {
     override def toString(): String = this.name
+
+    def this() = this("")
 }
 
 object Room {
