@@ -28,6 +28,6 @@ object Timeslot {
 
     implicit val localTimeFormat = new Format[LocalTime] {
         override def reads(json: JsValue): JsResult[LocalTime] = json.validate[String].map(LocalTime.parse)
-        override def writes(localTime: LocalTime): JsValue = Json.toJson(localTime.toString())
+        override def writes(localTime: LocalTime): JsValue = Json.toJson(localTime.toString)
     }
 }
