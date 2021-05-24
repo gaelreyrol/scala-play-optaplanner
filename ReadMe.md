@@ -10,7 +10,7 @@ Run `sbt run` and give it a try:
 curl -i -X POST http://localhost:9000/ \
     -H "Content-Type:application/json" \
     -d '{
-        "timeslotList":[
+        "timeslots":[
             {
                 "dayOfWeek":"MONDAY",
                 "startTime":"08:30:00",
@@ -21,7 +21,7 @@ curl -i -X POST http://localhost:9000/ \
                 "startTime":"09:30:00",
                 "endTime":"10:30:00"}
             ],
-        "roomList":[
+        "rooms":[
             {
                 "name":"Room A"
             },
@@ -29,7 +29,7 @@ curl -i -X POST http://localhost:9000/ \
                 "name":"Room B"
             }
         ],
-        "lessonList":[
+        "lessons":[
             {
                 "id":1,
                 "subject":"Math",
