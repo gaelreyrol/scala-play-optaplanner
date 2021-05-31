@@ -2,12 +2,13 @@ package models
 
 import org.optaplanner.core.api.domain.entity.PlanningEntity
 import org.optaplanner.core.api.domain.lookup.PlanningId
-import org.optaplanner.core.api.domain.variable.PlanningVariable;
+import org.optaplanner.core.api.domain.variable.PlanningVariable
 import io.circe._
 import io.circe.generic.semiauto._
 
 @PlanningEntity
-case class Lesson (val id: Int, val subject: String, val teacher: String, val studentGroup: String) {
+case class Lesson (val id: Int, val subject: String, val teacher: String, val studentGroup: String) extends Comparable[Lesson] {
+
     @PlanningId
     val internalId: Int = id
 
@@ -26,9 +27,12 @@ case class Lesson (val id: Int, val subject: String, val teacher: String, val st
     def this() = this(0, "", "", "")
 
     override def toString(): String = "%s (%d) - %s : %s".format(this.subject, this.id, this.teacher, this.studentGroup)
+
+    def compareTo(other: Lesson) = internalId compareTo other.internalId
 }
 
 object Lesson {
+
     implicit val encode: Encoder[Lesson] = new Encoder[Lesson] {
         final def apply(l: Lesson): Json = Json.obj(
             ("id", Json.fromInt(l.internalId)),
