@@ -3,7 +3,8 @@ package models
 import org.optaplanner.core.api.domain.entity.PlanningEntity
 import org.optaplanner.core.api.domain.lookup.PlanningId
 import org.optaplanner.core.api.domain.variable.PlanningVariable;
-import play.api.libs.json._
+import io.circe._
+import io.circe.generic.semiauto._
 
 @PlanningEntity
 case class Lesson (val id: Int, val subject: String, val teacher: String, val studentGroup: String) {
@@ -28,6 +29,26 @@ case class Lesson (val id: Int, val subject: String, val teacher: String, val st
 }
 
 object Lesson {
-    implicit val reads: Reads[Lesson] = Json.reads[Lesson]
-    implicit val writes: Writes[Lesson] = Json.writes[Lesson]
+    implicit val encode: Encoder[Lesson] = new Encoder[Lesson] {
+        final def apply(l: Lesson): Json = Json.obj(
+            ("id", Json.fromInt(l.internalId)),
+            ("subject", Json.fromString(l.subject)),
+            ("teacher", Json.fromString(l.subject)),
+            ("studentGroup", Json.fromString(l.subject)),
+            // ("timeslot", Json.fromJsonObject(l.timeslot)),
+            // ("room", Json.fromJsonObject(l.room)),
+        )
+    }
+
+    implicit val decode: Decoder[Lesson] = new Decoder[Lesson] {
+        final def apply(l: HCursor): Decoder.Result[Lesson] =
+            for {
+                id <- l.downField("id").as[Int]
+                subject <- l.downField("subject").as[String]
+                teacher <- l.downField("teacher").as[String]
+                studentGroup <- l.downField("studentGroup").as[String]
+            } yield {
+                new Lesson(id, subject, teacher, studentGroup)
+            }
+    }
 }

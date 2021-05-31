@@ -6,23 +6,23 @@ import org.optaplanner.core.api.domain.solution.PlanningEntityCollectionProperty
 import org.optaplanner.core.api.domain.solution.PlanningScore
 import org.optaplanner.core.api.domain.valuerange.ValueRangeProvider
 import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore
-import play.api.libs.json._
-import play.api.libs.functional.syntax._
 import scala.jdk.CollectionConverters._
+import io.circe._
+import io.circe.generic.semiauto._
 
 @PlanningSolution
 case class TimeTable(private val _timeslots: List[Timeslot], private val _rooms: List[Room], private val _lessons: List[Lesson]) {
 
     @ProblemFactCollectionProperty
     @ValueRangeProvider(id = "timeslotRange")
-    val timeslots: java.util.List[Timeslot] = _timeslots.asJava
+    var timeslots: java.util.List[Timeslot] = _timeslots.asJava
 
     @ProblemFactCollectionProperty
     @ValueRangeProvider(id = "roomRange")
-    val rooms: java.util.List[Room] = _rooms.asJava
+    var rooms: java.util.List[Room] = _rooms.asJava
 
     @PlanningEntityCollectionProperty
-    val lessons: java.util.List[Lesson] = _lessons.asJava
+    var lessons: java.util.List[Lesson] = _lessons.asJava
 
     @PlanningScore
     var score: HardSoftScore = _;
@@ -31,15 +31,23 @@ case class TimeTable(private val _timeslots: List[Timeslot], private val _rooms:
 }
 
 object TimeTable {
-    implicit val reads: Reads[TimeTable] = (
-        (JsPath \ "timeslots").read[List[Timeslot]] and
-        (JsPath \ "rooms").read[List[Room]] and
-        (JsPath \ "lessons").read[List[Lesson]]
-    ) (TimeTable.apply _)
+    implicit val encode: Encoder[TimeTable] = new Encoder[TimeTable] {
+        final def apply(t: TimeTable): Json = Json.obj(
+            // ("timeslots", Json.fromValues(t.timeslots)),
+            // ("rooms", Json.fromValues(t.rooms)),
+            // ("lessons", Json.fromValues(t.lessons)),
+            ("score", Json.fromString(t.score.toString()))
+        )
+    }
 
-    implicit  var writes: Writes[TimeTable] = (
-        (JsPath \ "timeslots").write[List[Timeslot]] and
-        (JsPath \ "rooms").write[List[Room]] and
-        (JsPath \ "lessons").write[List[Lesson]]
-    ) (unlift(TimeTable.unapply))
+    implicit val decode: Decoder[TimeTable] = new Decoder[TimeTable] {
+        final def apply(t: HCursor): Decoder.Result[TimeTable] =
+            for {
+                timeslots <- t.downField("timeslots").as[List[Timeslot]]
+                rooms <- t.downField("rooms").as[List[Room]]
+                lessons <- t.downField("lessons").as[List[Lesson]]
+            } yield {
+                new TimeTable(timeslots, rooms, lessons)
+            }
+    }
 }
